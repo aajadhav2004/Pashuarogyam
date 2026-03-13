@@ -54,7 +54,6 @@ def create_app(config=None):
     app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
     
     # Create session directory if it doesn't exist
-    import os
     os.makedirs('/tmp/flask_session', exist_ok=True)
     logger.info("✓ Filesystem sessions configured")
     
