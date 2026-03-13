@@ -47,8 +47,13 @@ def create_app(config=None):
     
     # Session configuration - MongoDB for production & local consistency
     from config import MONGODB_URI
+    from pymongo import MongoClient
+    
+    # Create MongoClient instance for Flask-Session
+    mongo_client = MongoClient(MONGODB_URI)
+    
     app.config['SESSION_TYPE'] = 'mongodb'
-    app.config['SESSION_MONGODB'] = MONGODB_URI
+    app.config['SESSION_MONGODB'] = mongo_client
     app.config['SESSION_MONGODB_DB'] = 'pashudb'
     app.config['SESSION_MONGODB_COLLECT'] = 'sessions'
     app.config['SESSION_PERMANENT'] = True
