@@ -7,7 +7,7 @@
 
 > **Revolutionary AI-powered veterinary platform combining advanced machine learning, multilingual chatbot assistance, and professional veterinary consultation for comprehensive animal healthcare.**
 
-![PashuArogyam Homepage](static/uploads/banner1.png)
+![PashuArogyam Homepage](Home.png)
 
 ## 🌟 Overview
 
