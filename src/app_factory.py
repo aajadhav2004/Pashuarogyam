@@ -49,16 +49,34 @@ def create_app(config=None):
     from config import MONGODB_URI
     from pymongo import MongoClient
     
-    # Create MongoClient instance for Flask-Session
-    mongo_client = MongoClient(MONGODB_URI)
-    
-    app.config['SESSION_TYPE'] = 'mongodb'
-    app.config['SESSION_MONGODB'] = mongo_client
-    app.config['SESSION_MONGODB_DB'] = 'pashudb'
-    app.config['SESSION_MONGODB_COLLECT'] = 'sessions'
-    app.config['SESSION_PERMANENT'] = True
-    app.config['SESSION_USE_SIGNER'] = True
-    app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
+    try:
+        # Create MongoClient instance for Flask-Session
+        mongo_client = MongoClient(
+            MONGODB_URI,
+            serverSelectionTimeoutMS=5000,  # 5 second timeout
+            connectTimeoutMS=5000
+        )
+        # Test connection
+        mongo_client.admin.command('ping')
+        logger.info("✓ MongoDB connection successful for sessions")
+        
+        app.config['SESSION_TYPE'] = 'mongodb'
+        app.config['SESSION_MONGODB'] = mongo_client
+        app.config['SESSION_MONGODB_DB'] = 'pashudb'
+        app.config['SESSION_MONGODB_COLLECT'] = 'sessions'
+        app.config['SESSION_PERMANENT'] = True
+        app.config['SESSION_USE_SIGNER'] = True
+        app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
+        
+    except Exception as e:
+        logger.error(f"✗ MongoDB session connection failed: {e}")
+        logger.warning("Falling back to filesystem sessions")
+        # Fallback to filesystem sessions
+        app.config['SESSION_TYPE'] = 'filesystem'
+        app.config['SESSION_FILE_DIR'] = '/tmp/flask_session'
+        app.config['SESSION_PERMANENT'] = True
+        app.config['SESSION_USE_SIGNER'] = True
+        app.config['PERMANENT_SESSION_LIFETIME'] = 86400
     
     # Apply custom config if provided
     if config:
