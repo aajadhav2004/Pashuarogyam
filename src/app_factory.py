@@ -45,12 +45,26 @@ def create_app(config=None):
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
     
+    # Session configuration - MongoDB for production & local consistency
+    from config import MONGODB_URI
+    app.config['SESSION_TYPE'] = 'mongodb'
+    app.config['SESSION_MONGODB'] = MONGODB_URI
+    app.config['SESSION_MONGODB_DB'] = 'pashudb'
+    app.config['SESSION_MONGODB_COLLECT'] = 'sessions'
+    app.config['SESSION_PERMANENT'] = True
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
+    
     # Apply custom config if provided
     if config:
         app.config.update(config)
     
     # Create upload directory
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    
+    # Initialize Flask-Session
+    from flask_session import Session
+    Session(app)
     
     logger.info("Flask application created")
     
