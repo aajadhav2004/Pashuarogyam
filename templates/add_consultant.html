@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Consultant - PashuArogyam</title>
+
+    <!-- Include Navbar Styles -->
+    {% include 'includes/navbar_styles.html' %}
+
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
+        }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-header p {
+            font-size: 1.05rem;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .form-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border-left: 5px solid #4CAF50;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .info-banner-icon {
+            font-size: 1.5rem;
+            color: #2E7D32;
+            flex-shrink: 0;
+        }
+
+        .info-banner-text {
+            color: #2E7D32;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .info-banner-text strong {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #2D3748;
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .form-group label .required {
+            color: #dc3545;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.85rem 1.1rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: #fafbfc;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+            background: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 110px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .form-error {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            display: none;
+            font-weight: 500;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .alert {
+            padding: 1.1rem 1.3rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            display: none;
+            border-left: 5px solid;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2.5rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.9rem 2.2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-cancel {
+            background: #f0f2f5;
+            color: #333;
+            border: 2px solid #E2E8F0;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-cancel:hover {
+            background: #e8eaed;
+            border-color: #d0d0d0;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover {
+            color: #2E7D32;
+            gap: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+
+            .form-wrapper {
+                padding: 1.5rem;
+            }
+
+            .page-header {
+                padding: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Include Admin Navbar -->
+    {% include 'includes/admin_navbar.html' %}
+
+    <div class="container">
+        <a href="/admin-dashboard" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-user-md"></i>
+                Add New Consultant
+            </h1>
+            <p>Register a new veterinary consultant to the platform</p>
+        </div>
+
+        <div class="form-wrapper">
+            <div class="info-banner">
+                <div class="info-banner-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="info-banner-text">
+                    <strong>Important Information</strong>
+                    Fill in the consultant's details below. The consultant will be able to login with their email
+                    address.
+                </div>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <form id="addConsultantForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">
+                            Full Name
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" id="name" name="name" required placeholder="Dr. John Smith">
+                        <div class="form-error" id="name-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            Email Address
+                            <span class="required">*</span>
+                        </label>
+                        <input type="email" id="email" name="email" required placeholder="john@example.com">
+                        <div class="form-error" id="email-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210">
+                        <div class="form-error" id="phone-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience">
+                            Years of Experience
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" id="experience" name="experience" min="0" max="70" required
+                            placeholder="10">
+                        <div class="form-error" id="experience-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specialization">
+                            Specialization
+                            <span class="required">*</span>
+                        </label>
+                        <select id="specialization" name="specialization" required>
+                            <option value="">Select specialization</option>
+                            <option value="General Veterinary">General Veterinary</option>
+                            <option value="Cattle">Cattle</option>
+                            <option value="Poultry">Poultry</option>
+                            <option value="Sheep & Goat">Sheep & Goat</option>
+                            <option value="Swine">Swine</option>
+                            <option value="Equine">Equine</option>
+                            <option value="Small Animals">Small Animals</option>
+                            <option value="Exotic Animals">Exotic Animals</option>
+                        </select>
+                        <div class="form-error" id="specialization-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="qualification">Qualification</label>
+                        <input type="text" id="qualification" name="qualification" placeholder="e.g., BVSc, MVSc">
+                        <div class="form-error" id="qualification-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            Password
+                            <span class="required">*</span>
+                        </label>
+                        <div style="position: relative;">
+                            <input type="password" id="password" name="password" required placeholder="Enter password">
+                            <button type="button" class="password-toggle" onclick="togglePassword('password')"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #666;">
+                                <span id="password-toggle-icon">👁️</span>
+                            </button>
+                        </div>
+                        <div class="form-error" id="password-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">
+                            Confirm Password
+                            <span class="required">*</span>
+                        </label>
+                        <div style="position: relative;">
+                            <input type="password" id="confirm_password" name="confirm_password" required
+                                placeholder="Confirm password">
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #666;">
+                                <span id="confirm_password-toggle-icon">👁️</span>
+                            </button>
+                        </div>
+                        <div class="form-error" id="confirm_password-error"></div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="bio">Bio / About</label>
+                        <textarea id="bio" name="bio"
+                            placeholder="Brief description about the consultant's expertise and experience..."></textarea>
+                        <div class="form-error" id="bio-error"></div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <a href="/admin-dashboard" class="btn btn-cancel">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-submit" id="submitBtn">
+                        <span class="spinner" id="spinner"></span>
+                        <span id="submitText">
+                            <i class="fas fa-plus"></i>
+                            Add Consultant
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('addConsultantForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('spinner');
+        const submitText = document.getElementById('submitText');
+        const alertContainer = document.getElementById('alertContainer');
+
+        function showAlert(message, type = 'error') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} show`;
+            alertDiv.textContent = message;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    window.location.href = '/admin-dashboard';
+                }, 2000);
+            }
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.form-error').forEach(error => {
+                error.textContent = '';
+                error.classList.remove('show');
+            });
+        }
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            spinner.style.display = isLoading ? 'block' : 'none';
+        }
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + '-toggle-icon');
+
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearErrors();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const specialization = document.getElementById('specialization').value;
+            const experience = document.getElementById('experience').value;
+            const qualification = document.getElementById('qualification').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const bio = document.getElementById('bio').value.trim();
+
+            if (!name) {
+                document.getElementById('name-error').textContent = 'Name is required';
+                document.getElementById('name-error').classList.add('show');
+                return;
+            }
+
+            if (!email) {
+                document.getElementById('email-error').textContent = 'Email is required';
+                document.getElementById('email-error').classList.add('show');
+                return;
+            }
+
+            if (!specialization) {
+                document.getElementById('specialization-error').textContent = 'Specialization is required';
+                document.getElementById('specialization-error').classList.add('show');
+                return;
+            }
+
+            if (!experience || experience < 0) {
+                document.getElementById('experience-error').textContent = 'Valid experience is required';
+                document.getElementById('experience-error').classList.add('show');
+                return;
+            }
+
+            if (!password) {
+                document.getElementById('password-error').textContent = 'Password is required';
+                document.getElementById('password-error').classList.add('show');
+                return;
+            }
+
+            if (password.length < 8) {
+                document.getElementById('password-error').textContent = 'Password must be at least 8 characters';
+                document.getElementById('password-error').classList.add('show');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById('confirm_password-error').textContent = 'Passwords do not match';
+                document.getElementById('confirm_password-error').classList.add('show');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const requestBody = {
+                    name,
+                    email,
+                    phone,
+                    specialization,
+                    experience: parseInt(experience),
+                    qualification,
+                    password,
+                    bio
+                };
+
+                console.log('Sending request with password:', {
+                    ...requestBody,
+                    password: '***' // Don't log actual password
+                });
+
+                const response = await fetch('/admin/add-consultant', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Consultant added successfully! Redirecting...', 'success');
+                } else {
+                    showAlert(data.message || 'Failed to add consultant', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('An error occurred. Please try again.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        document.querySelectorAll('input, select, textarea').forEach(field => {
+            field.addEventListener('input', () => {
+                const errorId = field.id + '-error';
+                const errorDiv = document.getElementById(errorId);
+                if (errorDiv) {
+                    errorDiv.textContent = '';
+                    errorDiv.classList.remove('show');
+                }
+            });
+        });
+    </script>
+
+    <!-- Professional Footer -->
+    <footer style="background: #2c3e50; color: white; padding: 50px 30px 30px; margin-top: 60px;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 30px;">
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: 20px; color: #3CB371;">About PashuArogyam</h3>
+                    <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.8; font-size: 14px;">
+                        Professional veterinary consultation platform connecting farmers with expert consultants for
+                        animal healthcare.
+                    </p>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: 20px; color: #3CB371;">Quick Links</h3>
+                    <p style="margin-bottom: 10px;"><a href="/admin-dashboard"
+                            style="color: rgba(255, 255, 255, 0.8); text-decoration: none; line-height: 2; font-size: 14px;">Dashboard</a>
+                    </p>
+                    <p style="margin-bottom: 10px;"><a href="/admin/consultants"
+                            style="color: rgba(255, 255, 255, 0.8); text-decoration: none; line-height: 2; font-size: 14px;">Consultants</a>
+                    </p>
+                    <p style="margin-bottom: 10px;"><a href="#analytics"
+                            style="color: rgba(255, 255, 255, 0.8); text-decoration: none; line-height: 2; font-size: 14px;">Analytics</a>
+                    </p>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: 20px; color: #3CB371;">Admin Tools</h3>
+                    <p style="margin-bottom: 10px;"><a href="#"
+                            style="color: rgba(255, 255, 255, 0.8); text-decoration: none; line-height: 2; font-size: 14px;">User
+                            Management</a></p>
+                    <p style="margin-bottom: 10px;"><a href="#"
+                            style="color: rgba(255, 255, 255, 0.8); text-decoration: none; line-height: 2; font-size: 14px;">System
+                            Logs</a></p>
+                    <p style="margin-bottom: 10px;"><a href="#"
+                            style="color: rgba(255, 255, 255, 0.8); text-decoration: none; line-height: 2; font-size: 14px;">Reports</a>
+                    </p>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: 20px; color: #3CB371;">Contact</h3>
+                    <p style="color: rgba(255, 255, 255, 0.8); line-height: 2; font-size: 14px;">📧
+                        admin@pashuarogyam.com</p>
+                    <p style="color: rgba(255, 255, 255, 0.8); line-height: 2; font-size: 14px;">📞 +91 1800-XXX-XXXX
+                    </p>
+                    <p style="color: rgba(255, 255, 255, 0.8); line-height: 2; font-size: 14px;">🕒 24/7 Support
+                        Available</p>
+                </div>
+            </div>
+            <div
+                style="text-align: center; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                <p>&copy; 2024 PashuArogyam. All rights reserved. | Admin Panel</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

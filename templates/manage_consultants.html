@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Consultants - PashuArogyam</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Professional Navbar - Same as other dashboards */
+        .navbar {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            display: none;
+            overflow: hidden;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f7fa;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 5px 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 30px;
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: #333;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(46, 139, 87, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 139, 87, 0.4);
+        }
+
+        /* Consultants Grid */
+        .consultants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .consultant-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 25px 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-top: 5px solid #2E8B57;
+            position: relative;
+            text-align: center;
+        }
+
+        .consultant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .consultant-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: white;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3);
+        }
+
+        .consultant-name {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .status-badge.active {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            color: #388e3c;
+        }
+
+        .status-badge.inactive {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            color: #c62828;
+        }
+
+        .consultant-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .detail-icon {
+            color: #2E8B57;
+            font-size: 14px;
+        }
+
+        .detail-text {
+            word-break: break-word;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #e53935, #ef5350);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 57, 53, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 25px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #666;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            color: #999;
+            margin-bottom: 30px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 50px 30px 30px;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #3CB371;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            line-height: 2;
+            font-size: 14px;
+        }
+
+        .footer-section a:hover {
+            color: #3CB371;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-container {
+                height: auto;
+                padding: 15px 0;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .navbar-left {
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .consultants-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Professional Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="PashuArogyam Logo"
+                        style="height: 45px; width: auto;">
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/admin-dashboard">Dashboard</a></li>
+                    <li><a href="/admin/consultants">Consultants</a></li>
+                    <li><a href="#analytics">Analytics</a></li>
+                </ul>
+            </div>
+            <div class="navbar-right">
+                <div class="user-info" onclick="toggleUserDropdown()">
+                    <div class="user-avatar">👨‍💼</div>
+                    <div class="user-name">{{ session.get('name', 'Admin') }}</div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" class="dropdown-item">👤 My Profile</a>
+                        <a href="#" class="dropdown-item">⚙️ Settings</a>
+                        <a href="#" class="dropdown-item">📊 System Logs</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="/admin/logout" class="dropdown-item"
+                            onclick="return confirm('Are you sure you want to logout?')">🚪 Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <span>👨‍⚕️</span>
+                <span>Manage Consultants</span>
+            </h1>
+            <a href="/admin/add-consultant" class="add-btn">
+                <i class="fas fa-plus"></i>
+                Add New Consultant
+            </a>
+        </div>
+
+        <!-- Consultants Grid -->
+        {% if consultants %}
+        <div class="consultants-grid">
+            {% for consultant in consultants %}
+            <div class="consultant-card">
+                <!-- Doctor Symbol Centered -->
+                <div class="consultant-avatar">👨‍⚕️</div>
+
+                <!-- Doctor Name -->
+                <h3 class="consultant-name">Dr. {{ consultant.name }}</h3>
+
+                <!-- Status Badge -->
+                <span class="status-badge {{ consultant.status }}">{{ consultant.status }}</span>
+
+                <!-- Details in Small Text -->
+                <div class="consultant-details">
+                    <div class="detail-row">
+                        <i class="fas fa-envelope detail-icon"></i>
+                        <span class="detail-text">{{ consultant.email }}</span>
+                    </div>
+
+                    {% if consultant.phone %}
+                    <div class="detail-row">
+                        <i class="fas fa-phone detail-icon"></i>
+                        <span class="detail-text">{{ consultant.phone }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="detail-row">
+                        {% if consultant.specialization %}
+                        <div class="detail-row">
+                            <i class="fas fa-stethoscope detail-icon"></i>
+                            <span class="detail-text">{{ consultant.specialization }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if consultant.experience %}
+                        <div class="detail-row">
+                            <i class="fas fa-award detail-icon"></i>
+                            <span class="detail-text">{{ consultant.experience }} years</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+
+
+                    <!-- Edit and Delete Buttons -->
+                    <div class="card-actions">
+                        <button class="btn-edit" onclick="editConsultant('{{ consultant._id }}')">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </button>
+                        <button class="btn-delete"
+                            onclick="deleteConsultant('{{ consultant._id }}', '{{ consultant.name }}')">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">👨‍⚕️</div>
+                <h3>No Consultants Found</h3>
+                <p>Start by adding your first consultant to the platform</p>
+                <a href="/admin/add-consultant" class="add-btn">
+                    <i class="fas fa-plus"></i>
+                    Add First Consultant
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h3>About PashuArogyam</h3>
+                    <p>Professional veterinary consultation platform connecting farmers with expert consultants for
+                        animal
+                        healthcare.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="/admin-dashboard">Dashboard</a></p>
+                    <p><a href="/admin/consultants">Consultants</a></p>
+                    <p><a href="#analytics">Analytics</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Admin Tools</h3>
+                    <p><a href="#">User Management</a></p>
+                    <p><a href="#">System Logs</a></p>
+                    <p><a href="#">Reports</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>📧 admin@pashuaarogyam.com</p>
+                    <p>📞 +91 1800-XXX-XXXX</p>
+                    <p>🕒 24/7 Support Available</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 PashuArogyam. All rights reserved. | Admin Panel</p>
+            </div>
+        </footer>
+
+        <script>
+            // Toggle user dropdown
+            function toggleUserDropdown() {
+                const dropdown = document.getElementById('userDropdown');
+                dropdown.classList.toggle('show');
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (event) {
+                const userInfo = document.querySelector('.user-info');
+                const dropdown = document.getElementById('userDropdown');
+
+                if (dropdown && !userInfo.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            // Edit consultant function
+            function editConsultant(consultantId) {
+                // Redirect to edit page (you can create this page later)
+                window.location.href = `/admin/edit-consultant/${consultantId}`;
+            }
+
+            // Delete consultant function
+            async function deleteConsultant(consultantId, consultantName) {
+                if (!confirm(`Are you sure you want to delete Dr. ${consultantName}? This action cannot be undone.`)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/admin/delete-consultant/${consultantId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showNotification('Consultant deleted successfully!', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showNotification(data.message || 'Failed to delete consultant', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting consultant:', error);
+                    showNotification('Network error while deleting consultant', 'error');
+                }
+            }
+
+            // Show notification
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                position: fixed;
+                top: 90px;
+                right: 30px;
+                padding: 20px 25px;
+                border-radius: 15px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                max-width: 400px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                transform: translateX(120%);
+                transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                font-size: 15px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            `;
+
+                const icon = type === 'error' ? '❌' : '✅';
+
+                if (type === 'error') {
+                    notification.style.background = 'linear-gradient(135deg, #d32f2f, #f44336)';
+                } else {
+                    notification.style.background = 'linear-gradient(135deg, #388e3c, #4caf50)';
+                }
+
+                notification.innerHTML = `<span style="font-size: 20px;">${icon}</span><span>${message}</span>`;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(120%)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 400);
+                }, 5000);
+            }
+        </script>
+
+        <!-- Google Translate widget -->
+        <div id="google_translate_element"></div>
+        <script src="{{ url_for('static', filename='js/translate.js') }}"></script>
+</body>
+
+</html>

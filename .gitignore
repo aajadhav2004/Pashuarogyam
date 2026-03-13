@@ -1,0 +1,275 @@
+# =================== PYTHON ===================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# =================== VIRTUAL ENVIRONMENTS ===================
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.env/
+
+# =================== ENVIRONMENT VARIABLES ===================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+*.env
+
+# =================== LARGE MODEL FILES ===================
+# PyTorch Models - Store on Hugging Face Hub instead
+models/
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.pb
+
+# Model cache and downloads
+models_cache/
+model_cache/
+.cache/
+downloads/
+checkpoints/
+
+# =================== FLASK SPECIFIC ===================
+instance/
+.webassets-cache
+*.db
+*.sqlite3
+
+# =================== DEVELOPMENT TOOLS ===================
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# =================== OPERATING SYSTEM ===================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# =================== LOGS AND DEBUGGING ===================
+*.log
+logs/
+debug.log
+error.log
+access.log
+
+# =================== TESTING ===================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# =================== TYPE CHECKING ===================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# =================== DOCUMENTATION ===================
+# Temporary documentation files
+docs/_build/
+site/
+
+# =================== UPLOADS AND USER DATA ===================
+# User uploaded files (keep structure but ignore content)
+static/uploads/*
+!static/uploads/.gitkeep
+!static/uploads/banner1.png
+uploads/
+temp/
+tmp/
+
+# =================== DEPLOYMENT SPECIFIC ===================
+# Docker
+Dockerfile.prod
+docker-compose.prod.yml
+.dockerignore
+
+# Deployment configs (keep templates)
+deploy/
+.deploy/
+k8s/
+terraform/
+
+# =================== LARGE DEPENDENCIES ===================
+# Node modules (if using any frontend build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =================== BACKUP AND TEMPORARY FILES ===================
+*.bak
+*.backup
+*.tmp
+*.temp
+*.old
+*.orig
+*.swp
+*.swo
+*~
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# =================== DATABASE ===================
+# Local database files
+*.sqlite
+*.sqlite3
+*.db
+data/
+database/
+
+# Database dumps
+*.sql
+*.dump
+
+# =================== SECURITY ===================
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.cert
+
+# API keys and secrets (additional protection)
+secrets/
+.secrets/
+credentials/
+.credentials/
+
+# =================== CLEANUP SCRIPTS OUTPUT ===================
+# Files created by cleanup scripts
+cleanup_report.txt
+deployment_report.txt
+
+# =================== DOCUMENTATION GENERATED FILES ===================
+# Generated during development (keep source .md files)
+CHATBOT_AUTHENTICATION_FIX.md
+CHATBOT_FIX_COMPLETE.md
+HUGGINGFACE_ACCOUNT_CHANGE_GUIDE.md
+LANGUAGE_DROPDOWN_FIX_COMPLETE.md
+MULTILINGUAL_CHATBOT_FIX.md
+QUICK_START_HF_CHANGE.md
+HF_CHANGE_SUMMARY.txt
+FREE_DEPLOYMENT_OPTIONS.md
+SAFE_CLEANUP_GUIDE.md
+FREE_DEPLOYMENT_GUIDE.md
+GIT_SETUP_GUIDE.md
+
+# Utility scripts (one-time use)
+upload_models_to_new_account.py
+cleanup_for_deployment.py
+
+# =================== OLD/LEGACY CODE ===================
+# Old folders and files
+oldfolder/
+old/
+legacy/
+backup/
+archive/
+tests/demo_*.py
+
+# =================== PERFORMANCE AND MONITORING ===================
+# Performance logs
+*.prof
+*.profile
+
+# Monitoring data
+monitoring/
+metrics/
+
+# =================== MISCELLANEOUS ===================
+# Temporary Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Compiled extensions
+*.so
+*.dylib
+*.dll
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+
+# =================== KEEP THESE IMPORTANT FILES ===================
+# Essential files that should be tracked:
+# - app_modular.py
+# - config.py
+# - requirements.txt
+# - README.md
+# - src/ (entire folder)
+# - static/ (except uploads)
+# - templates/
+# - .gitignore (this file)

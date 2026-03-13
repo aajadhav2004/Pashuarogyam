@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard - PashuArogyam</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Professional Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            display: none;
+            overflow: hidden;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f7fa;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 5px 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 30px;
+            width: 100%;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(46, 139, 87, 0.3);
+        }
+
+        .welcome-section h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-section p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .section-title {
+            font-size: 28px;
+            color: #2E8B57;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            border-left: 4px solid #2E8B57;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2E8B57;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            color: #2E8B57;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .feature-card.enhanced {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+        }
+
+        .feature-card.enhanced h3,
+        .feature-card.enhanced p {
+            color: white;
+        }
+
+        /* Recent Activity */
+        .activity-section {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 50px;
+        }
+
+        .activity-item {
+            padding: 20px;
+            border-left: 3px solid #2E8B57;
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .activity-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .activity-time {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .activity-text {
+            color: #333;
+            font-size: 15px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 50px 30px 30px;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            color: #bdc3c7;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #3CB371;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bdc3c7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-container {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 0;
+            }
+
+            .navbar-left {
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .welcome-section h1 {
+                font-size: 28px;
+            }
+
+            .stats-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Professional Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="PashuArogyam Logo"
+                        style="height: 45px; width: auto;">
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/farmer/dashboard">🏠 Dashboard</a></li>
+                    <li><a href="/disease-detection">🔬 Disease Detection</a></li>
+                    <li><a href="/consultation-request">👨‍⚕️ Consult</a></li>
+                    <li><a href="/chatbot">🤖 AI Assistant</a></li>
+                </ul>
+            </div>
+            <div class="navbar-right">
+                <div class="user-info" onclick="toggleUserDropdown()">
+                    <div class="user-avatar">👨‍🌾</div>
+                    <div class="user-name">Fr. {{ session.name or 'Farmer' }}</div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" class="dropdown-item">👤 My Profile</a>
+                        <a href="#" class="dropdown-item">⚙️ Settings</a>
+                        <a href="#" class="dropdown-item">📊 My Reports</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="/auth/logout" class="dropdown-item"
+                            onclick="return confirm('Are you sure you want to logout?')">🚪 Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1>👋 Welcome back, Fr. {{ session.name or 'Farmer' }}!</h1>
+            <p>Manage your farm and keep your livestock healthy with our AI-powered tools</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <h2 class="section-title">📊 Your Farm Overview</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🐄</div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Animals Registered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔬</div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Health Checks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👨‍⚕️</div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Consultations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">Active Alerts</div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <h2 class="section-title">🚀 Quick Actions</h2>
+        <div class="features-grid">
+            <div class="feature-card" onclick="window.location.href='/disease-detection'">
+                <span class="feature-icon">🔬</span>
+                <h3>Disease Detection</h3>
+                <p>Upload photos or describe symptoms to get instant AI-powered disease diagnosis</p>
+            </div>
+
+            <div class="feature-card" onclick="window.location.href='/ai-disease-prediction'">
+                <span class="feature-icon">💬</span>
+                <h3>AI Health Prediction</h3>
+                <p>Advanced AI combining image analysis with symptom assessment for accurate diagnosis</p>
+            </div>
+
+            <div class="feature-card" onclick="window.location.href='/consultation-request'">
+                <span class="feature-icon">👨‍⚕️</span>
+                <h3>Expert Consultation</h3>
+                <p>Connect with professional veterinarians for personalized advice and treatment plans</p>
+            </div>
+
+            <div class="feature-card" onclick="window.location.href='/chatbot'">
+                <span class="feature-icon">🤖</span>
+                <h3>24/7 AI Assistant</h3>
+                <p>Get instant answers to your animal health questions anytime, in your language</p>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <h2 class="section-title">📋 Recent Activity</h2>
+        <div class="activity-section">
+            <div class="activity-item">
+                <div class="activity-time">No recent activity</div>
+                <div class="activity-text">Start using our services to see your activity here</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>🐄 PashuArogyam</h4>
+                    <p>Revolutionizing animal healthcare with AI-powered solutions for farmers across India.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="/farmer-dashboard">Dashboard</a></li>
+                        <li><a href="/disease-detection">Disease Detection</a></li>
+                        <li><a href="/consultation-request">Consultations</a></li>
+                        <li><a href="/chatbot">AI Assistant</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Report Issue</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Data Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 PashuArogyam. All rights reserved. Made with ❤️ for Indian Farmers</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.user-info')) {
+                const dropdown = document.getElementById('userDropdown');
+                dropdown.classList.remove('show');
+            }
+        });
+    </script>
+
+    <!-- Google Translate widget -->
+    <div id="google_translate_element" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div>
+    <script src="{{ url_for('static', filename='js/translate.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - PashuAarogyam</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #334155;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Professional Navbar - Same as Farmer/Consultant */
+        .navbar {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            display: none;
+            overflow: hidden;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f7fa;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 5px 0;
+        }
+
+        /* Hide old header styles */
+        .admin-header,
+        .admin-nav,
+        .admin-brand,
+        .admin-user-info,
+        .logout-btn {
+            display: none !important;
+        }
+
+
+        .admin-brand::before {
+            content: "🐾";
+            font-size: 2rem;
+        }
+
+        .admin-logo {
+            display: none;
+            /* Hide the logo div since we're using the emoji */
+        }
+
+        .admin-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .admin-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-avatar {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .user-details h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .user-details p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .add-consultant-btn {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .add-consultant-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            color: white;
+        }
+
+        .add-consultant-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 2rem;
+            padding: 1rem 2rem 0 2rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* Main Container */
+        .admin-container {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 30px;
+            width: 100%;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .welcome-section h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-section p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        /* Add Consultant Button */
+        .add-consultant-section {
+            margin-bottom: 30px;
+        }
+
+        .add-consultant-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(46, 139, 87, 0.3);
+        }
+
+        .add-consultant-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 139, 87, 0.4);
+        }
+
+        /* Stats Grid */
+        .stats-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2E8B57;
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3CB371;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: #3CB371;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-left-color: #2E8B57;
+        }
+
+        .stat-card:hover .stat-number {
+            color: #238B45;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            opacity: 0.9;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2E8B57;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            justify-content: center;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .stat-change.positive {
+            color: #2E8B57;
+            background: rgba(46, 139, 87, 0.1);
+        }
+
+        .stat-change.negative {
+            color: #FF6B35;
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        /* Dashboard Sections */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-left: 5px solid #3CB371;
+        }
+
+        .section-header {
+            background: #f8f9fa;
+            color: #2E8B57;
+            padding: 1.5rem 2rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #3CB371;
+        }
+
+        .section-header h3 {
+            color: #2E8B57;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .section-header span {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        /* Charts */
+        .chart-container {
+            height: 300px;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-left: 5px solid #3CB371;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            max-height: 400px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            color: #2E8B57;
+            font-weight: 600;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #3CB371;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #333;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #FFF3E0;
+            color: #FF6B35;
+        }
+
+        .status-approved {
+            background: #E8F5E8;
+            color: #2E8B57;
+        }
+
+        .status-rejected {
+            background: #FFEBEE;
+            color: #D32F2F;
+        }
+
+        .urgency-high {
+            background: #FFEBEE;
+            color: #D32F2F;
+        }
+
+        .urgency-medium {
+            background: #FFF3E0;
+            color: #FF6B35;
+        }
+
+        .urgency-low {
+            background: #E8F5E8;
+            color: #2E8B57;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border-left: 5px solid #3CB371;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem 1.5rem;
+            background: #FF6B35;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.4);
+            color: white;
+        }
+
+        /* System Status */
+        .system-status {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border-left: 5px solid #3CB371;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .status-online {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-offline {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-details h4 {
+            margin: 0 0 5px 0;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+
+        .status-details p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-nav {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .admin-container {
+                padding: 20px 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .stat-card {
+                min-height: 180px;
+                padding: 1.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #64748b;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .admin-container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .dashboard-grid,
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Footer - Same as Farmer/Consultant */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 50px 30px 30px;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #3CB371;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            line-height: 2;
+            font-size: 14px;
+        }
+
+        .footer-section a:hover {
+            color: #3CB371;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Professional Navbar - Same as Farmer/Consultant -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="PashuArogyam Logo"
+                        style="height: 45px; width: auto;">
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/admin-dashboard">Dashboard</a></li>
+                    <li><a href="/admin/consultants">Consultants</a></li>
+                    <li><a href="#analytics">Analytics</a></li>
+                </ul>
+            </div>
+            <div class="navbar-right">
+                <div class="user-info" onclick="toggleUserDropdown()">
+                    <div class="user-avatar">👨‍💼</div>
+                    <div class="user-name">Ad. {{ session.get('name', 'Admin') }}</div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" class="dropdown-item">👤 My Profile</a>
+                        <a href="#" class="dropdown-item">⚙️ Settings</a>
+                        <a href="#" class="dropdown-item">📊 System Logs</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="/admin/logout" class="dropdown-item"
+                            onclick="return confirm('Are you sure you want to logout?')">🚪 Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="admin-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1>
+                <span>👋</span>
+                <span>Welcome, Ad. {{ session.get('name', 'Admin') }}</span>
+            </h1>
+            <p>Manage the PashuArogyam platform and monitor system performance</p>
+        </div>
+
+
+
+        <!-- Database Status Alert -->
+        {% if not db_available %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Database Connection Issue:</strong> Some features may be limited due to database connectivity
+            issues.
+        </div>
+        {% endif %}
+
+        <!-- Statistics Section -->
+        <section class="stats-section">
+            <h2 class="section-title">System Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card users">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number">{{ stats.total_users }}</div>
+                    <div class="stat-label">Total Farmers</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +12% from last month
+                    </div>
+                </div>
+
+                <div class="stat-card consultants">
+                    <div class="stat-icon">👨‍⚕️</div>
+                    <div class="stat-number">{{ stats.total_consultants }}</div>
+                    <div class="stat-label">Active Consultants</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +8% from last month
+                    </div>
+                </div>
+
+                <div class="stat-card predictions">
+                    <div class="stat-icon">🔬</div>
+                    <div class="stat-number">{{ stats.total_predictions }}</div>
+                    <div class="stat-label">Disease Predictions</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +25% from last month
+                    </div>
+                </div>
+
+                <div class="stat-card consultations">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-number">{{ stats.total_consultation_requests }}</div>
+                    <div class="stat-label">Consultations</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +15% from last month
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="stats-section">
+            <h2 class="section-title">Analytics & Insights</h2>
+            <div class="chart-grid">
+                <div class="chart-section">
+                    <div class="section-header">
+                        <h3>Disease Distribution</h3>
+                    </div>
+                    <div class="section-content">
+                        <div class="chart-container">
+                            <canvas id="diseaseChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="section-header">
+                        <h3>Monthly Activity</h3>
+                    </div>
+                    <div class="section-content">
+                        <div class="chart-container">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="actions-grid">
+                <a href="#" class="action-btn" onclick="refreshStats()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh Data
+                </a>
+                <a href="#" class="action-btn" onclick="exportData()">
+                    <i class="fas fa-download"></i>
+                    Export Reports
+                </a>
+                <a href="#" class="action-btn" onclick="manageUsers()">
+                    <i class="fas fa-users-cog"></i>
+                    Manage Users
+                </a>
+                <a href="#" class="action-btn" onclick="systemLogs()">
+                    <i class="fas fa-file-alt"></i>
+                    System Logs
+                </a>
+            </div>
+        </section>
+
+        <!-- System Status -->
+        <section class="system-status">
+            <h2 class="section-title">System Status</h2>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-icon {% if db_available %}status-online{% else %}status-offline{% endif %}">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="status-details">
+                        <h4>Database</h4>
+                        <p>{% if db_available %}Connected and operational{% else %}Connection issues detected{% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div class="status-icon status-online">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="status-details">
+                        <h4>AI Models</h4>
+                        <p>All models loaded and ready</p>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div class="status-icon status-online">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <div class="status-details">
+                        <h4>Cloud Services</h4>
+                        <p>All services operational</p>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div class="status-icon status-online">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="status-details">
+                        <h4>Security</h4>
+                        <p>All systems secure</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Data Sections -->
+        <div class="dashboard-grid">
+            <!-- Recent Users -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h3>Recent Users</h3>
+                    <span>{{ stats.recent_users|length }} users</span>
+                </div>
+                <div class="section-content">
+                    {% if stats.recent_users %}
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in stats.recent_users %}
+                                <tr>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.created_at }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="loading">
+                        <p>No recent users data available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Predictions -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h3>Recent Predictions</h3>
+                    <span>{{ stats.recent_predictions|length }} predictions</span>
+                </div>
+                <div class="section-content">
+                    {% if stats.recent_predictions %}
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Animal</th>
+                                    <th>Prediction</th>
+                                    <th>Confidence</th>
+                                    <th>User</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pred in stats.recent_predictions %}
+                                <tr>
+                                    <td>{{ pred.animal_type }}</td>
+                                    <td>{{ pred.prediction }}</td>
+                                    <td>{{ "%.1f"|format(pred.confidence * 100) }}%</td>
+                                    <td>{{ pred.user_name }}</td>
+                                    <td>{{ pred.created_at }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="loading">
+                        <p>No recent predictions data available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Consultation Requests -->
+        <div class="dashboard-section" style="margin-bottom: 40px;">
+            <div class="section-header">
+                <h3>Recent Consultation Requests</h3>
+                <span>{{ stats.recent_consultations|length }} requests</span>
+            </div>
+            <div class="section-content">
+                {% if stats.recent_consultations %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Farmer</th>
+                                <th>Email</th>
+                                <th>Animal Type</th>
+                                <th>Status</th>
+                                <th>Urgency</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consult in stats.recent_consultations %}
+                            <tr>
+                                <td>{{ consult.farmer_name }}</td>
+                                <td>{{ consult.farmer_email }}</td>
+                                <td>{{ consult.animal_type }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ consult.status.lower() }}">
+                                        {{ consult.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge urgency-{{ consult.urgency.lower() }}">
+                                        {{ consult.urgency }}
+                                    </span>
+                                </td>
+                                <td>{{ consult.created_at }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="loading">
+                    <p>No recent consultation requests available</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            try {
+                // Disease Distribution Pie Chart
+                const diseaseCtx = document.getElementById('diseaseChart');
+                if (diseaseCtx) {
+                    const diseaseChart = new Chart(diseaseCtx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Cattle Diseases', 'Dog Diseases', 'Cat Diseases', 'Other'],
+                            datasets: [{
+                                data: [35, 25, 20, 20],
+                                backgroundColor: [
+                                    '#2E8B57',
+                                    '#3CB371',
+                                    '#FF6B35',
+                                    '#90EE90'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Monthly Activity Line Chart
+                const activityCtx = document.getElementById('activityChart');
+                if (activityCtx) {
+                    const activityChart = new Chart(activityCtx.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Predictions',
+                                data: [65, 59, 80, 81, 56, 95],
+                                borderColor: '#2E8B57',
+                                backgroundColor: 'rgba(46, 139, 87, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }, {
+                                label: 'Consultations',
+                                data: [28, 48, 40, 39, 46, 67],
+                                borderColor: '#FF6B35',
+                                backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: '#e2e8f0'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        color: '#e2e8f0'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error initializing charts:', error);
+            }
+        }
+
+        // Quick Action Functions
+        function refreshStats() {
+            location.reload();
+        }
+
+        function exportData() {
+            // Show loading state
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+            btn.style.pointerEvents = 'none';
+
+            // Create a link to download the PDF
+            window.location.href = '/admin/export-report';
+
+            // Reset button after a short delay
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.pointerEvents = 'auto';
+            }, 3000);
+        }
+
+        function manageUsers() {
+            alert('User management functionality will be implemented soon!');
+        }
+
+        function systemLogs() {
+            alert('System logs viewer will be implemented soon!');
+        }
+
+        // Auto-refresh every 5 minutes
+        setInterval(function () {
+            console.log('Auto-refreshing dashboard data...');
+            // You can implement auto-refresh logic here
+        }, 300000);
+
+        // Add some interactive animations
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Toggle user dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const userInfo = document.querySelector('.user-info');
+            const dropdown = document.getElementById('userDropdown');
+
+            if (dropdown && !userInfo.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    </script>
+
+    <!-- Footer - Same as Farmer/Consultant -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>About PashuArogyam</h3>
+                <p>Professional veterinary consultation platform connecting farmers with expert consultants for animal
+                    healthcare.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <p><a href="/admin-dashboard">Dashboard</a></p>
+                <p><a href="/admin/add-consultant">Add Consultant</a></p>
+                <p><a href="#analytics">Analytics</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>Admin Tools</h3>
+                <p><a href="#">User Management</a></p>
+                <p><a href="#">System Logs</a></p>
+                <p><a href="#">Reports</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>📧 admin@pashuaarogyam.com</p>
+                <p>📞 +91 1800-XXX-XXXX</p>
+                <p>🕒 24/7 Support Available</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 PashuArogyam. All rights reserved. | Admin Panel</p>
+        </div>
+    </footer>
+
+    <!-- Google Translate widget -->
+    <div id="google_translate_element"></div>
+    <script src="{{ url_for('static', filename='js/translate.js') }}"></script>
+</body>
+
+</html>

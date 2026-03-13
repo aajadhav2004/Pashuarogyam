@@ -1,0 +1,48 @@
+<!-- Admin Navbar - Include this in all admin-related pages -->
+<nav class="navbar">
+    <div class="navbar-container">
+        <div class="navbar-left">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="PashuArogyam Logo"
+                    style="height: 45px; width: auto;">
+            </div>
+            <ul class="nav-links">
+                <li><a href="/admin-dashboard">Dashboard</a></li>
+                <li><a href="/admin/consultants">Consultants</a></li>
+                <li><a href="#analytics">Analytics</a></li>
+            </ul>
+        </div>
+        <div class="navbar-right">
+            <div class="user-info" onclick="toggleUserDropdown()">
+                <div class="user-avatar">👨‍💼</div>
+                <div class="user-name">{{ session.get('name', 'Admin') }}</div>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="#" class="dropdown-item">👤 My Profile</a>
+                    <a href="#" class="dropdown-item">⚙️ Settings</a>
+                    <a href="#" class="dropdown-item">📊 System Logs</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/admin/logout" class="dropdown-item"
+                        onclick="return confirm('Are you sure you want to logout?')">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Toggle user dropdown
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (event) {
+        const userInfo = document.querySelector('.user-info');
+        const dropdown = document.getElementById('userDropdown');
+
+        if (dropdown && !userInfo.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+</script>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sign Up - PashuArogyam</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <h1>PashuArogyam</h1>
+                </div>
+                <p>🛠️ Create Admin Account</p>
+            </div>
+
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                    <div class="form-error" id="name-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="form-error" id="email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            <span id="password-toggle-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div class="form-error" id="password-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div class="password-input">
+                        <input type="password" id="confirm_password" name="confirm_password" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                            <span id="confirm_password-toggle-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div class="form-error" id="confirm_password-error"></div>
+                </div>
+
+                <button type="submit" class="auth-button" id="signupButton">
+                    <span class="button-text">Create Admin Account</span>
+                    <div class="button-spinner" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="/admin/login">Sign in</a></p>
+                    <p><a href="/">← Back to Home</a></p>
+                </div>
+            </form>
+
+            <div class="alert" id="alertMessage" style="display: none;"></div>
+        </div>
+
+        <div class="auth-background">
+            <div class="background-pattern"></div>
+            <div class="background-content">
+                <h2>Admin Dashboard</h2>
+                <p>Create your admin account to manage the PashuArogyam platform, add consultants, and monitor system
+                    activities.</p>
+                <div class="feature-highlights">
+                    <div class="feature-item">
+                        <span class="feature-icon">👥</span>
+                        <span>Manage Consultants</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span>System Analytics</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⚙️</span>
+                        <span>Platform Settings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const signupButton = document.getElementById('signupButton');
+            const spinner = signupButton.querySelector('.button-spinner');
+            const buttonText = signupButton.querySelector('.button-text');
+
+            signupButton.disabled = true;
+            spinner.style.display = 'block';
+            buttonText.style.display = 'none';
+
+            try {
+                const response = await fetch('/auth/admin/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, password, confirm_password: confirmPassword })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('An error occurred. Please try again.', 'error');
+            } finally {
+                signupButton.disabled = false;
+                spinner.style.display = 'none';
+                buttonText.style.display = 'block';
+            }
+        });
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + '-toggle-icon');
+
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>
+
+<!-- Google Translate widget (languages: English, Hindi, Marathi) -->
+<div id="google_translate_element"></div>
+<script src="{{ url_for('static', filename='js/translate.js') }}"></script>

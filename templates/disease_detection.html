@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Detection - PashuArogyam</title>
+
+    <!-- Include Navbar Styles -->
+    {% include 'includes/navbar_styles.html' %}
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/disease-detection.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+
+<body>
+    <!-- Include Farmer Navbar -->
+    {% include 'includes/farmer_navbar.html' %}
+
+    <!-- Main Content -->
+    <div class="detection-page-wrapper">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>🔬 AI Disease Detection</h1>
+                <p>Choose your preferred method for accurate animal disease detection</p>
+            </div>
+
+            <!-- Detection Methods -->
+            <div class="methods-container">
+                <!-- Method 1: Enhanced AI with Symptoms -->
+                <div class="method-card featured" onclick="window.location.href='/ai-disease-prediction';">
+                    <div class="method-badge">RECOMMENDED</div>
+                    <div class="method-header">
+                        <div class="method-icon">
+                            <div class="icon-circle">🧠</div>
+                        </div>
+                        <div class="method-info">
+                            <h2>Enhanced AI Disease Prediction</h2>
+                            <p class="method-description">
+                                Advanced AI-powered diagnosis combining image analysis with comprehensive symptom
+                                assessment using Gemini AI for more accurate results
+                            </p>
+                            <button class="method-btn primary-btn">
+                                Start Enhanced Detection →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Method 2: YOLO Models -->
+                <div class="method-card">
+                    <div class="method-header">
+                        <div class="method-icon">
+                            <div class="icon-circle secondary">🎯</div>
+                        </div>
+                        <div class="method-info">
+                            <h2>Trained YOLO Models</h2>
+                            <p class="method-description">
+                                Fast and accurate disease detection using specialized YOLOv8 models trained for specific
+                                animals. Simply upload an image for instant analysis
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="animals-section">
+                        <p class="select-label">Select Animal for Detection:</p>
+                        <div class="animal-buttons">
+                            <button class="animal-btn"
+                                onclick="event.stopPropagation(); window.location.href='/cat-detection';">
+                                <span class="animal-emoji">🐱</span>
+                                <span>Cat</span>
+                            </button>
+                            <button class="animal-btn"
+                                onclick="event.stopPropagation(); window.location.href='/cow-detection';">
+                                <span class="animal-emoji">🐄</span>
+                                <span>Cow</span>
+                            </button>
+                            <button class="animal-btn"
+                                onclick="event.stopPropagation(); window.location.href='/dog-detection';">
+                                <span class="animal-emoji">🐕</span>
+                                <span>Dog</span>
+                            </button>
+                            <button class="animal-btn"
+                                onclick="event.stopPropagation(); window.location.href='/sheep-detection';">
+                                <span class="animal-emoji">🐑</span>
+                                <span>Sheep</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Section -->
+            <div class="comparison-section">
+                <h3>Which Method Should I Choose?</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-icon">🧠</div>
+                        <h4>Enhanced AI</h4>
+                        <p>Best for comprehensive diagnosis when you can describe symptoms and have images</p>
+                    </div>
+                    <div class="comparison-card">
+                        <div class="comparison-icon">🎯</div>
+                        <h4>YOLO Models</h4>
+                        <p>Best for quick detection when you only have images of the affected animal</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .detection-page-wrapper {
+            min-height: calc(100vh - 70px);
+            background: linear-gradient(135deg, #f0f4f8 0%, #e8f0f5 100%);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #2E8B57;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .methods-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-bottom: 50px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .method-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 3px solid transparent;
+            width: 100%;
+        }
+
+        .method-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .method-card.featured {
+            border-color: #2E8B57;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff8 100%);
+            cursor: pointer;
+        }
+
+        .method-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .method-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .method-icon {
+            flex-shrink: 0;
+        }
+
+        .icon-circle {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 0 10px 30px rgba(46, 139, 87, 0.3);
+        }
+
+        .icon-circle.secondary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .method-info {
+            flex: 1;
+        }
+
+        .method-card h2 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .method-description {
+            color: #666;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .method-btn {
+            padding: 16px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            box-shadow: 0 5px 20px rgba(46, 139, 87, 0.3);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46, 139, 87, 0.4);
+        }
+
+        .animals-section {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 3px solid #f0f0f0;
+        }
+
+        .select-label {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .animal-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .animal-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .animal-btn:hover {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-color: #3498db;
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .animal-emoji {
+            font-size: 3.5rem;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .comparison-section h3 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .comparison-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .comparison-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .comparison-card h4 {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .comparison-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .method-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .method-card {
+                padding: 30px 20px;
+            }
+
+            .method-card h2 {
+                font-size: 1.8rem;
+            }
+
+            .animal-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .icon-circle {
+                width: 100px;
+                height: 100px;
+                font-size: 3rem;
+            }
+        }
+    </style>
+
+    <script>
+        // Prevent card click when clicking animal buttons
+        document.querySelectorAll('.animal-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+    </script>
+</body>
+
+</html>
+
+<!-- Google Translate widget (languages: English, Hindi, Marathi) -->
+<div id="google_translate_element"></div>
+<script src="{{ url_for('static', filename='js/translate.js') }}"></script>

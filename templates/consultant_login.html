@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultant Login - PashuArogyam</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="PashuArogyam Logo"
+                        style="height: 50px; width: auto;">
+                </div>
+                <p>👨‍⚕️ Consultant Login</p>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="form-error" id="email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            <span id="password-toggle-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div class="form-error" id="password-error"></div>
+                </div>
+
+                <button type="submit" class="auth-button" id="loginButton">
+                    <span class="button-text">Sign In</span>
+                    <div class="button-spinner" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+
+                <div class="auth-footer">
+                    <p><a href="/">← Back to Home</a></p>
+                </div>
+            </form>
+
+            <div class="alert" id="alertMessage" style="display: none;"></div>
+        </div>
+
+        <div class="auth-background">
+            <div class="background-pattern"></div>
+            <div class="background-content">
+                <h2>Welcome Consultant!</h2>
+                <p>Access your veterinary consultation dashboard and provide expert guidance to farmers for optimal
+                    animal health and care.</p>
+                <div class="feature-highlights">
+                    <div class="feature-item">
+                        <span class="feature-icon">📋</span>
+                        <span>Consultation Requests</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <span>Direct Chat Support</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span>Case Management</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginButton = document.getElementById('loginButton');
+            const spinner = loginButton.querySelector('.button-spinner');
+            const buttonText = loginButton.querySelector('.button-text');
+
+            loginButton.disabled = true;
+            spinner.style.display = 'block';
+            buttonText.style.display = 'none';
+
+            try {
+                const response = await fetch('/auth/consultant/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('An error occurred. Please try again.', 'error');
+            } finally {
+                loginButton.disabled = false;
+                spinner.style.display = 'none';
+                buttonText.style.display = 'block';
+            }
+        });
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + '-toggle-icon');
+
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>
+
+<!-- Google Translate widget (languages: English, Hindi, Marathi) -->
+<div id="google_translate_element"></div>
+<script src="{{ url_for('static', filename='js/translate.js') }}"></script>

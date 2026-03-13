@@ -1,0 +1,32 @@
+<svg width="180" height="50" viewBox="0 0 180 50" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle for better visibility -->
+  <circle cx="25" cy="25" r="22" fill="white" opacity="0.95"/>
+  
+  <!-- Main icon - Veterinary cross with animal -->
+  <g transform="translate(25, 25)">
+    <!-- Medical cross -->
+    <rect x="-2" y="-12" width="4" height="24" fill="#2E8B57" rx="2"/>
+    <rect x="-12" y="-2" width="24" height="4" fill="#2E8B57" rx="2"/>
+    
+    <!-- Heart symbol -->
+    <path d="M -6,-8 Q -8,-10 -10,-8 Q -12,-6 -10,-4 L 0,4 L 10,-4 Q 12,-6 10,-8 Q 8,-10 6,-8 Q 4,-6 0,-4 Q -4,-6 -6,-8 Z" 
+          fill="#FF6B35" opacity="0.9"/>
+    
+    <!-- Paw print -->
+    <g transform="translate(0, 8)">
+      <ellipse cx="0" cy="0" rx="3" ry="4" fill="#3CB371"/>
+      <ellipse cx="-3" cy="-3" rx="2" ry="2.5" fill="#3CB371"/>
+      <ellipse cx="3" cy="-3" rx="2" ry="2.5" fill="#3CB371"/>
+      <ellipse cx="-4" cy="2" rx="1.5" ry="2" fill="#3CB371"/>
+      <ellipse cx="4" cy="2" rx="1.5" ry="2" fill="#3CB371"/>
+    </g>
+  </g>
+  
+  <!-- Text -->
+  <text x="55" y="22" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="700" fill="white" letter-spacing="0.5">
+    PashuArogyam
+  </text>
+  <text x="55" y="37" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="500" fill="white" opacity="0.9" letter-spacing="1">
+    ANIMAL HEALTH AI
+  </text>
+</svg>
