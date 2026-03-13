@@ -775,7 +775,7 @@
             document.getElementById('predictButton').disabled = true;
 
             try {
-                const response = await fetch('/predict/integrated', {
+                const response = await fetch('/predict_disease', {
                     method: 'POST',
                     body: formData
                 });

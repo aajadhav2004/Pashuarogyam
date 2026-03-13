@@ -236,10 +236,10 @@
             document.getElementById('resultsSection').classList.remove('show');
 
             const formData = new FormData();
-            formData.append('image', currentImageFile);
+            formData.append('photo', currentImageFile);
 
             try {
-                const response = await fetch('/predict/sheep', {
+                const response = await fetch('/sheep-detection', {
                     method: 'POST',
                     body: formData
                 });

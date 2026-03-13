@@ -360,7 +360,7 @@
 
     <div class="container">
         <div class="prediction-container">
-             <div class="header-section">
+            <div class="header-section">
                 <h1><i class="fas fa-brain"></i> Enhanced AI Disease Prediction</h1>
                 <p>Advanced AI-powered disease prediction combining image analysis with symptom assessment</p>
             </div>
@@ -697,7 +697,7 @@
             showLoading(true);
 
             try {
-                const response = await fetch('/predict/ai_enhanced', {
+                const response = await fetch('/predict_disease', {
                     method: 'POST',
                     body: formData
                 });

@@ -233,21 +233,22 @@ def register_basic_routes(app):
     def consultation_form():
         """Consultation request form"""
         if 'user_id' not in session:
-            return redirect(url_for('login_page'))
+            return redirect(url_for('farmer_login_page'))
         return render_template('consultation_form.html')
     
+    @app.route('/ai-disease-prediction')
     @app.route('/ai-disease-prediction')
     def ai_disease_prediction():
         """Enhanced AI disease prediction page"""
         if 'user_id' not in session:
-            return redirect(url_for('login_page'))
-        return render_template('integrated_prediction.html')
+            return redirect(url_for('farmer_login_page'))
+        return render_template('ai_disease_prediction.html')
     
     @app.route('/consultation-request')
     def consultation_request_page():
         """Consultation request page"""
         if 'user_id' not in session:
-            return redirect(url_for('login_page'))
+            return redirect(url_for('farmer_login_page'))
         return render_template('consultation_request.html')
 
 

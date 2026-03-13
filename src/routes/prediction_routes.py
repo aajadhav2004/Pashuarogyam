@@ -904,17 +904,32 @@ def register_prediction_routes(app, config):
             if 'user_id' not in session:
                 return jsonify({'success': False, 'message': 'User not logged in'}), 401
             
+            # Debug: Log all form data
+            logger.info(f"Form data received: {dict(request.form)}")
+            logger.info(f"Files received: {list(request.files.keys())}")
+            
             # Get form data
             animal_type = request.form.get('animal_type', '').lower()
-            symptoms = request.form.get('symptoms', '')
-            age = request.form.get('age', '')
-            weight = request.form.get('weight', '')
-            temperature = request.form.get('temperature', '')
-            additional_info = request.form.get('additional_info', '')
+            
+            # Handle symptoms array
+            symptoms_list = request.form.getlist('symptoms[]')
+            symptoms = ', '.join(symptoms_list) if symptoms_list else ''
+            
+            # Get other form data with correct field names
+            age = request.form.get('animal_age', '')
+            weight = request.form.get('animal_weight', '')
+            duration = request.form.get('duration', '')
+            severity = request.form.get('severity', '')
+            additional_info = request.form.get('additional_symptoms', '')
+            
+            logger.info(f"Processed data - Animal: {animal_type}, Symptoms: {symptoms}, Age: {age}")
             
             # Validate input
-            if not animal_type or not symptoms:
-                return jsonify({'success': False, 'message': 'Animal type and symptoms are required'}), 400
+            if not animal_type:
+                return jsonify({'success': False, 'message': 'Animal type is required'}), 400
+            
+            if not symptoms and not additional_info:
+                return jsonify({'success': False, 'message': 'Please select symptoms or provide additional information'}), 400
             
             # Check database availability
             db_available, _ = get_db_status()
@@ -923,7 +938,7 @@ def register_prediction_routes(app, config):
             
             # Mock disease prediction logic
             prediction_result = mock_disease_prediction(
-                animal_type, symptoms, age, weight, temperature, additional_info
+                animal_type, symptoms, age, weight, duration, severity, additional_info
             )
             
             # Save prediction to database
@@ -933,7 +948,8 @@ def register_prediction_routes(app, config):
                 'symptoms': symptoms,
                 'age': age,
                 'weight': weight,
-                'temperature': temperature,
+                'duration': duration,
+                'severity': severity,
                 'additional_info': additional_info,
                 'prediction': prediction_result,
                 'created_at': datetime.utcnow()
@@ -957,7 +973,7 @@ def register_prediction_routes(app, config):
         """Cat disease detection"""
         if request.method == 'GET':
             if 'user_id' not in session:
-                return redirect(url_for('login_page'))
+                return redirect(url_for('farmer_login_page'))
             return render_template('cat_detection.html')
         
         # POST request - handle image upload
@@ -985,12 +1001,43 @@ def register_prediction_routes(app, config):
             model = load_model('cat')
             results = model.predict(file_path)
             
-            # Extract prediction results
-            prediction_text = "Cat disease prediction completed"
+            # Process YOLO results
+            predictions = []
+            if results and len(results) > 0:
+                result = results[0]  # First result
+                if result.boxes is not None and len(result.boxes) > 0:
+                    # Process detected boxes
+                    for box in result.boxes:
+                        class_id = int(box.cls[0])
+                        confidence = float(box.conf[0])
+                        class_name = result.names[class_id] if hasattr(result, 'names') else f"Class_{class_id}"
+                        
+                        predictions.append({
+                            'class': class_name,
+                            'confidence': confidence,
+                            'quality_warning': confidence < 0.7
+                        })
+                else:
+                    # No detections found
+                    predictions.append({
+                        'class': 'Healthy',
+                        'confidence': 0.8,
+                        'quality_warning': False
+                    })
+            else:
+                # No results
+                predictions.append({
+                    'class': 'Unable to analyze',
+                    'confidence': 0.5,
+                    'quality_warning': True
+                })
+            
+            # Sort by confidence (highest first)
+            predictions.sort(key=lambda x: x['confidence'], reverse=True)
             
             return jsonify({
                 'success': True,
-                'prediction': prediction_text,
+                'predictions': predictions,
                 'image_path': unique_filename
             })
         
@@ -1004,7 +1051,7 @@ def register_prediction_routes(app, config):
         """Cow disease detection"""
         if request.method == 'GET':
             if 'user_id' not in session:
-                return redirect(url_for('login_page'))
+                return redirect(url_for('farmer_login_page'))
             return render_template('cow_detection.html')
         
         # POST request - handle image upload
@@ -1032,12 +1079,43 @@ def register_prediction_routes(app, config):
             model = load_model('cow')
             results = model.predict(file_path)
             
-            # Extract prediction results
-            prediction_text = "Cow disease prediction completed"
+            # Process YOLO results
+            predictions = []
+            if results and len(results) > 0:
+                result = results[0]  # First result
+                if result.boxes is not None and len(result.boxes) > 0:
+                    # Process detected boxes
+                    for box in result.boxes:
+                        class_id = int(box.cls[0])
+                        confidence = float(box.conf[0])
+                        class_name = result.names[class_id] if hasattr(result, 'names') else f"Class_{class_id}"
+                        
+                        predictions.append({
+                            'class': class_name,
+                            'confidence': confidence,
+                            'quality_warning': confidence < 0.7
+                        })
+                else:
+                    # No detections found
+                    predictions.append({
+                        'class': 'Healthy',
+                        'confidence': 0.8,
+                        'quality_warning': False
+                    })
+            else:
+                # No results
+                predictions.append({
+                    'class': 'Unable to analyze',
+                    'confidence': 0.5,
+                    'quality_warning': True
+                })
+            
+            # Sort by confidence (highest first)
+            predictions.sort(key=lambda x: x['confidence'], reverse=True)
             
             return jsonify({
                 'success': True,
-                'prediction': prediction_text,
+                'predictions': predictions,
                 'image_path': unique_filename
             })
         
@@ -1051,7 +1129,7 @@ def register_prediction_routes(app, config):
         """Dog disease detection"""
         if request.method == 'GET':
             if 'user_id' not in session:
-                return redirect(url_for('login_page'))
+                return redirect(url_for('farmer_login_page'))
             return render_template('dog_detection.html')
         
         # POST request - handle image upload
@@ -1079,12 +1157,43 @@ def register_prediction_routes(app, config):
             model = load_model('dog')
             results = model.predict(file_path)
             
-            # Extract prediction results
-            prediction_text = "Dog disease prediction completed"
+            # Process YOLO results
+            predictions = []
+            if results and len(results) > 0:
+                result = results[0]  # First result
+                if result.boxes is not None and len(result.boxes) > 0:
+                    # Process detected boxes
+                    for box in result.boxes:
+                        class_id = int(box.cls[0])
+                        confidence = float(box.conf[0])
+                        class_name = result.names[class_id] if hasattr(result, 'names') else f"Class_{class_id}"
+                        
+                        predictions.append({
+                            'class': class_name,
+                            'confidence': confidence,
+                            'quality_warning': confidence < 0.7
+                        })
+                else:
+                    # No detections found
+                    predictions.append({
+                        'class': 'Healthy',
+                        'confidence': 0.8,
+                        'quality_warning': False
+                    })
+            else:
+                # No results
+                predictions.append({
+                    'class': 'Unable to analyze',
+                    'confidence': 0.5,
+                    'quality_warning': True
+                })
+            
+            # Sort by confidence (highest first)
+            predictions.sort(key=lambda x: x['confidence'], reverse=True)
             
             return jsonify({
                 'success': True,
-                'prediction': prediction_text,
+                'predictions': predictions,
                 'image_path': unique_filename
             })
         
@@ -1098,7 +1207,7 @@ def register_prediction_routes(app, config):
         """Sheep disease detection"""
         if request.method == 'GET':
             if 'user_id' not in session:
-                return redirect(url_for('login_page'))
+                return redirect(url_for('farmer_login_page'))
             return render_template('sheep_detection.html')
         
         # POST request - handle image upload
@@ -1126,12 +1235,43 @@ def register_prediction_routes(app, config):
             model = load_model('sheep')
             results = model.predict(file_path)
             
-            # Extract prediction results
-            prediction_text = "Sheep disease prediction completed"
+            # Process YOLO results
+            predictions = []
+            if results and len(results) > 0:
+                result = results[0]  # First result
+                if result.boxes is not None and len(result.boxes) > 0:
+                    # Process detected boxes
+                    for box in result.boxes:
+                        class_id = int(box.cls[0])
+                        confidence = float(box.conf[0])
+                        class_name = result.names[class_id] if hasattr(result, 'names') else f"Class_{class_id}"
+                        
+                        predictions.append({
+                            'class': class_name,
+                            'confidence': confidence,
+                            'quality_warning': confidence < 0.7
+                        })
+                else:
+                    # No detections found
+                    predictions.append({
+                        'class': 'Healthy',
+                        'confidence': 0.8,
+                        'quality_warning': False
+                    })
+            else:
+                # No results
+                predictions.append({
+                    'class': 'Unable to analyze',
+                    'confidence': 0.5,
+                    'quality_warning': True
+                })
+            
+            # Sort by confidence (highest first)
+            predictions.sort(key=lambda x: x['confidence'], reverse=True)
             
             return jsonify({
                 'success': True,
-                'prediction': prediction_text,
+                'predictions': predictions,
                 'image_path': unique_filename
             })
         
@@ -1140,11 +1280,35 @@ def register_prediction_routes(app, config):
             return jsonify({'success': False, 'error': str(e)}), 500
 
 
-def mock_disease_prediction(animal_type, symptoms, age, weight, temperature, additional_info):
+def mock_disease_prediction(animal_type, symptoms, age, weight, duration, severity, additional_info):
     """Mock disease prediction function"""
+    
+    # Create a more realistic prediction based on inputs
+    diseases = {
+        'cow': ['Mastitis', 'Foot and Mouth Disease', 'Bloat', 'Milk Fever'],
+        'cat': ['Upper Respiratory Infection', 'Feline Leukemia', 'Urinary Tract Infection'],
+        'dog': ['Parvovirus', 'Kennel Cough', 'Hip Dysplasia', 'Skin Allergies'],
+        'sheep': ['Foot Rot', 'Internal Parasites', 'Pneumonia', 'Scrapie']
+    }
+    
+    # Select disease based on animal type
+    animal_diseases = diseases.get(animal_type, ['Unknown Disease'])
+    selected_disease = animal_diseases[0]  # For simplicity, pick first one
+    
+    # Determine confidence based on symptom count
+    symptom_count = len(symptoms.split(',')) if symptoms else 0
+    base_confidence = 0.6 + (symptom_count * 0.1)
+    confidence = min(base_confidence, 0.95)
+    
+    # Determine severity
+    severity_level = severity if severity else 'Moderate'
+    
     return {
-        'disease': 'Sample Disease',
-        'confidence': 0.85,
-        'recommendations': 'Consult a veterinarian',
-        'severity': 'Moderate'
+        'disease': selected_disease,
+        'confidence': confidence,
+        'recommendations': f'Consult a veterinarian for {selected_disease.lower()} treatment',
+        'severity': severity_level,
+        'symptoms_analyzed': symptoms,
+        'duration': duration,
+        'additional_notes': additional_info
     }

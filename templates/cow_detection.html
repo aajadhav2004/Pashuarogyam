@@ -495,10 +495,10 @@
             document.getElementById('resultsSection').classList.remove('show');
 
             const formData = new FormData();
-            formData.append('image', currentImageFile);
+            formData.append('photo', currentImageFile);
 
             try {
-                const response = await fetch('/predict/cow', {
+                const response = await fetch('/cow-detection', {
                     method: 'POST',
                     body: formData
                 });

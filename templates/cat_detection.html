@@ -497,10 +497,10 @@
             document.getElementById('resultsSection').classList.remove('show');
 
             const formData = new FormData();
-            formData.append('image', currentImageFile);
+            formData.append('photo', currentImageFile);
 
             try {
-                const response = await fetch('/predict/cat', {
+                const response = await fetch('/cat-detection', {
                     method: 'POST',
                     body: formData
                 });
