@@ -295,18 +295,37 @@ CHATBOT_ENABLE_FALLBACK=true
    python cleanup_for_deployment.py
    ```
 
-2. **Push to GitHub**
+2. **Configure Memory Optimization (CRITICAL for Render's 512MB RAM limit)**
+
+   Ensure these environment variables are set in your `.env` file:
+
+   ```bash
+   # Memory optimization - prevents RAM limit exceeded errors
+   ENABLE_MODEL_UNLOAD=true
+   MODEL_CACHE_SIZE=1
+   ```
+
+   **How it works:**
+   - Only 1 YOLO model is kept in memory at a time
+   - Models are automatically unloaded after prediction
+   - Old uploaded images are deleted when user uploads new ones
+   - Garbage collection runs after each model unload
+   - Saves ~300MB RAM + unlimited disk space
+
+   **Without this:** Your app will crash on Render with "Memory limit exceeded" errors
+
+3. **Push to GitHub**
 
    ```bash
    git init
    git add .
-   git commit -m "Initial deployment"
+   git commit -m "Initial deployment with memory optimization"
    git push origin main
    ```
 
-3. **Deploy on chosen platform**
+4. **Deploy on chosen platform**
    - Connect GitHub repository
-   - Set environment variables
+   - Set environment variables (including ENABLE_MODEL_UNLOAD=true)
    - Deploy automatically
 
 ## 📊 Performance Metrics

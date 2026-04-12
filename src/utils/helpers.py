@@ -5,6 +5,7 @@ Includes validation, password hashing, and utility functions
 import re
 import bcrypt
 import logging
+import os
 from config import ALLOWED_EXTENSIONS
 
 logger = logging.getLogger(__name__)
@@ -52,3 +53,54 @@ def check_password(password, hashed):
     except Exception as e:
         logger.error(f"Password check error: {str(e)}")
         return False
+
+
+def cleanup_previous_upload(session, upload_folder, animal_type):
+    """
+    Delete previous uploaded image for this animal type from this user's session.
+    This saves disk space by removing old images when user uploads a new one.
+    
+    Args:
+        session: Flask session object
+        upload_folder: Path to upload folder
+        animal_type: Type of animal (cat, dog, cow, sheep)
+    
+    Returns:
+        bool: True if cleanup was successful or no file to clean, False on error
+    """
+    try:
+        # Create session key for this animal type
+        session_key = f'last_upload_{animal_type}'
+        
+        # Check if there's a previous upload for this animal type
+        if session_key in session:
+            previous_file = session[session_key]
+            file_path = os.path.join(upload_folder, previous_file)
+            
+            # Delete the file if it exists
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                logger.info(f"Deleted previous upload: {previous_file}")
+            
+            # Remove from session
+            session.pop(session_key, None)
+        
+        return True
+    
+    except Exception as e:
+        logger.error(f"Error cleaning up previous upload: {str(e)}")
+        return False
+
+
+def save_upload_to_session(session, animal_type, filename):
+    """
+    Save the uploaded filename to session for later cleanup.
+    
+    Args:
+        session: Flask session object
+        animal_type: Type of animal (cat, dog, cow, sheep)
+        filename: Name of the uploaded file
+    """
+    session_key = f'last_upload_{animal_type}'
+    session[session_key] = filename
+    logger.info(f"Saved upload to session: {filename} for {animal_type}")

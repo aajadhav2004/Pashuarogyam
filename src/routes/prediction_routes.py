@@ -5,8 +5,8 @@ Handles disease prediction endpoints for different animals
 from flask import render_template, request, jsonify, session, redirect, url_for
 from src.services.database import predictions_collection, consultants_collection, get_db_status
 from src.services.ai_service import call_gemini_with_retry
-from src.services.model_service import load_model
-from src.utils.helpers import allowed_file
+from src.services.model_service import load_model, unload_model_after_prediction
+from src.utils.helpers import allowed_file, cleanup_previous_upload, save_upload_to_session
 from werkzeug.utils import secure_filename
 from bson import ObjectId
 from datetime import datetime
@@ -991,15 +991,24 @@ def register_prediction_routes(app, config):
             if not allowed_file(file.filename):
                 return jsonify({'success': False, 'error': 'Invalid file type'}), 400
             
+            # DISK SPACE OPTIMIZATION: Delete previous upload for this animal type
+            cleanup_previous_upload(session, config['UPLOAD_FOLDER'], 'cat')
+            
             # Process image and make prediction
             filename = secure_filename(file.filename)
             unique_filename = str(uuid.uuid4()) + '_' + filename
             file_path = os.path.join(config['UPLOAD_FOLDER'], unique_filename)
             file.save(file_path)
             
+            # Save this upload to session for future cleanup
+            save_upload_to_session(session, 'cat', unique_filename)
+            
             # Load model and make prediction
             model = load_model('cat')
             results = model.predict(file_path)
+            
+            # MEMORY OPTIMIZATION: Unload model immediately after prediction
+            unload_model_after_prediction('cat')
             
             # Process YOLO results
             predictions = []
@@ -1069,15 +1078,24 @@ def register_prediction_routes(app, config):
             if not allowed_file(file.filename):
                 return jsonify({'success': False, 'error': 'Invalid file type'}), 400
             
+            # DISK SPACE OPTIMIZATION: Delete previous upload for this animal type
+            cleanup_previous_upload(session, config['UPLOAD_FOLDER'], 'cow')
+            
             # Process image and make prediction
             filename = secure_filename(file.filename)
             unique_filename = str(uuid.uuid4()) + '_' + filename
             file_path = os.path.join(config['UPLOAD_FOLDER'], unique_filename)
             file.save(file_path)
             
+            # Save this upload to session for future cleanup
+            save_upload_to_session(session, 'cow', unique_filename)
+            
             # Load model and make prediction
             model = load_model('cow')
             results = model.predict(file_path)
+            
+            # MEMORY OPTIMIZATION: Unload model immediately after prediction
+            unload_model_after_prediction('cow')
             
             # Process YOLO results
             predictions = []
@@ -1147,15 +1165,24 @@ def register_prediction_routes(app, config):
             if not allowed_file(file.filename):
                 return jsonify({'success': False, 'error': 'Invalid file type'}), 400
             
+            # DISK SPACE OPTIMIZATION: Delete previous upload for this animal type
+            cleanup_previous_upload(session, config['UPLOAD_FOLDER'], 'dog')
+            
             # Process image and make prediction
             filename = secure_filename(file.filename)
             unique_filename = str(uuid.uuid4()) + '_' + filename
             file_path = os.path.join(config['UPLOAD_FOLDER'], unique_filename)
             file.save(file_path)
             
+            # Save this upload to session for future cleanup
+            save_upload_to_session(session, 'dog', unique_filename)
+            
             # Load model and make prediction
             model = load_model('dog')
             results = model.predict(file_path)
+            
+            # MEMORY OPTIMIZATION: Unload model immediately after prediction
+            unload_model_after_prediction('dog')
             
             # Process YOLO results
             predictions = []
@@ -1225,15 +1252,24 @@ def register_prediction_routes(app, config):
             if not allowed_file(file.filename):
                 return jsonify({'success': False, 'error': 'Invalid file type'}), 400
             
+            # DISK SPACE OPTIMIZATION: Delete previous upload for this animal type
+            cleanup_previous_upload(session, config['UPLOAD_FOLDER'], 'sheep')
+            
             # Process image and make prediction
             filename = secure_filename(file.filename)
             unique_filename = str(uuid.uuid4()) + '_' + filename
             file_path = os.path.join(config['UPLOAD_FOLDER'], unique_filename)
             file.save(file_path)
             
+            # Save this upload to session for future cleanup
+            save_upload_to_session(session, 'sheep', unique_filename)
+            
             # Load model and make prediction
             model = load_model('sheep')
             results = model.predict(file_path)
+            
+            # MEMORY OPTIMIZATION: Unload model immediately after prediction
+            unload_model_after_prediction('sheep')
             
             # Process YOLO results
             predictions = []

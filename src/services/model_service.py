@@ -30,6 +30,7 @@ def load_model(animal_type):
     """
     Lazy load YOLO model from Hugging Face on first use.
     This prevents timeout during deployment by deferring model download.
+    Automatically unloads other models to save RAM (important for Render's 512MB limit).
     """
     global models
     
@@ -38,7 +39,20 @@ def load_model(animal_type):
     
     # Return cached model if already loaded
     if models[animal_type] is not None:
+        logger.info(f"Using cached {animal_type} model")
         return models[animal_type]
+    
+    # MEMORY OPTIMIZATION: Clear other models before loading new one
+    # This ensures only 1 model is in memory at a time (critical for Render's RAM limit)
+    for key in models:
+        if key != animal_type and models[key] is not None:
+            logger.info(f"Clearing {key} model from memory to free RAM")
+            models[key] = None
+    
+    # Force garbage collection to free memory immediately
+    import gc
+    gc.collect()
+    logger.info(f"Memory cleared, now loading {animal_type} model")
     
     try:
         # Get the model filename
@@ -90,5 +104,27 @@ def clear_models():
     """Clear all loaded models from memory"""
     global models
     for animal_type in models:
+        if models[animal_type] is not None:
+            logger.info(f"Clearing {animal_type} model from memory")
+            models[animal_type] = None
+    
+    # Force garbage collection
+    import gc
+    gc.collect()
+    logger.info("All models cleared from memory and garbage collected")
+
+
+def unload_model_after_prediction(animal_type):
+    """
+    Unload a specific model after prediction to free memory.
+    Use this after prediction is complete to minimize RAM usage.
+    """
+    global models
+    if animal_type in models and models[animal_type] is not None:
+        logger.info(f"Unloading {animal_type} model after prediction")
         models[animal_type] = None
-    logger.info("All models cleared from memory")
+        
+        # Force garbage collection
+        import gc
+        gc.collect()
+        logger.info(f"{animal_type} model unloaded and memory freed")

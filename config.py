@@ -31,6 +31,12 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 HF_REPO_ID = os.getenv('HF_REPO_ID', 'gangurde/cattle_disease_model')
 HF_MODEL_CACHE_DIR = os.getenv('HF_MODEL_CACHE_DIR', 'models_cache')
 
+# =================== MODEL MEMORY OPTIMIZATION ===================
+# Enable automatic model unloading after prediction (recommended for Render's 512MB RAM limit)
+ENABLE_MODEL_UNLOAD = os.getenv('ENABLE_MODEL_UNLOAD', 'true').lower() == 'true'
+# Maximum number of models to keep in memory (1 = only current model, saves RAM)
+MODEL_CACHE_SIZE = int(os.getenv('MODEL_CACHE_SIZE', 1))
+
 # =================== CHATBOT CONFIGURATION ===================
 CHATBOT_OFFLINE_MODE = os.getenv('CHATBOT_OFFLINE_MODE', 'false').lower() == 'true'
 CHATBOT_ENABLE_FALLBACK = os.getenv('CHATBOT_ENABLE_FALLBACK', 'true').lower() == 'true'
