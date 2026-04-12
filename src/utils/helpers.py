@@ -7,6 +7,7 @@ import bcrypt
 import logging
 import os
 from config import ALLOWED_EXTENSIONS
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -104,3 +105,53 @@ def save_upload_to_session(session, animal_type, filename):
     session_key = f'last_upload_{animal_type}'
     session[session_key] = filename
     logger.info(f"Saved upload to session: {filename} for {animal_type}")
+
+
+
+def optimize_image_for_prediction(file_path, max_size=640):
+    """
+    Optimize uploaded image to reduce memory usage during prediction.
+    Resizes image if larger than max_size while maintaining aspect ratio.
+    
+    Args:
+        file_path: Path to the uploaded image
+        max_size: Maximum dimension (width or height) in pixels
+    
+    Returns:
+        bool: True if optimization was successful
+    """
+    try:
+        # Open image
+        img = Image.open(file_path)
+        
+        # Get original dimensions
+        width, height = img.size
+        
+        # Check if resizing is needed
+        if width > max_size or height > max_size:
+            # Calculate new dimensions maintaining aspect ratio
+            if width > height:
+                new_width = max_size
+                new_height = int((max_size / width) * height)
+            else:
+                new_height = max_size
+                new_width = int((max_size / height) * width)
+            
+            # Resize image
+            img = img.resize((new_width, new_height), Image.LANCZOS)
+            
+            # Save optimized image (overwrite original)
+            img.save(file_path, optimize=True, quality=85)
+            
+            logger.info(f"Image optimized: {width}x{height} -> {new_width}x{new_height}")
+        else:
+            logger.info(f"Image already optimal: {width}x{height}")
+        
+        # Close image to free memory
+        img.close()
+        
+        return True
+    
+    except Exception as e:
+        logger.error(f"Error optimizing image: {str(e)}")
+        return False

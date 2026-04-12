@@ -124,7 +124,16 @@ def unload_model_after_prediction(animal_type):
         logger.info(f"Unloading {animal_type} model after prediction")
         models[animal_type] = None
         
-        # Force garbage collection
+        # AGGRESSIVE MEMORY CLEANUP
         import gc
+        import torch
+        
+        # Clear PyTorch cache if available
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        
+        # Force multiple garbage collection passes
         gc.collect()
+        gc.collect()  # Second pass to catch circular references
+        
         logger.info(f"{animal_type} model unloaded and memory freed")

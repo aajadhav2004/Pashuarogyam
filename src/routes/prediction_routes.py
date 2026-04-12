@@ -6,7 +6,7 @@ from flask import render_template, request, jsonify, session, redirect, url_for
 from src.services.database import predictions_collection, consultants_collection, get_db_status
 from src.services.ai_service import call_gemini_with_retry
 from src.services.model_service import load_model, unload_model_after_prediction
-from src.utils.helpers import allowed_file, cleanup_previous_upload, save_upload_to_session
+from src.utils.helpers import allowed_file, cleanup_previous_upload, save_upload_to_session, optimize_image_for_prediction
 from werkzeug.utils import secure_filename
 from bson import ObjectId
 from datetime import datetime
@@ -1003,9 +1003,22 @@ def register_prediction_routes(app, config):
             # Save this upload to session for future cleanup
             save_upload_to_session(session, 'cat', unique_filename)
             
-            # Load model and make prediction
+            # MEMORY OPTIMIZATION: Resize large images before prediction
+            optimize_image_for_prediction(file_path, max_size=640)
+            
+            # Load model and make prediction with memory optimization
             model = load_model('cat')
-            results = model.predict(file_path)
+            
+            # AGGRESSIVE MEMORY OPTIMIZATION: Use minimal settings for prediction
+            results = model.predict(
+                file_path,
+                verbose=False,      # Reduce logging overhead
+                stream=False,       # Don't use streaming (saves memory)
+                imgsz=640,          # Use smaller image size (default is often larger)
+                half=False,         # Don't use FP16 (can cause issues on CPU)
+                device='cpu',       # Explicitly use CPU
+                max_det=10          # Limit max detections to save memory
+            )
             
             # MEMORY OPTIMIZATION: Unload model immediately after prediction
             unload_model_after_prediction('cat')
@@ -1090,9 +1103,22 @@ def register_prediction_routes(app, config):
             # Save this upload to session for future cleanup
             save_upload_to_session(session, 'cow', unique_filename)
             
-            # Load model and make prediction
+            # MEMORY OPTIMIZATION: Resize large images before prediction
+            optimize_image_for_prediction(file_path, max_size=640)
+            
+            # Load model and make prediction with memory optimization
             model = load_model('cow')
-            results = model.predict(file_path)
+            
+            # AGGRESSIVE MEMORY OPTIMIZATION: Use minimal settings for prediction
+            results = model.predict(
+                file_path,
+                verbose=False,      # Reduce logging overhead
+                stream=False,       # Don't use streaming (saves memory)
+                imgsz=640,          # Use smaller image size (default is often larger)
+                half=False,         # Don't use FP16 (can cause issues on CPU)
+                device='cpu',       # Explicitly use CPU
+                max_det=10          # Limit max detections to save memory
+            )
             
             # MEMORY OPTIMIZATION: Unload model immediately after prediction
             unload_model_after_prediction('cow')
@@ -1177,9 +1203,22 @@ def register_prediction_routes(app, config):
             # Save this upload to session for future cleanup
             save_upload_to_session(session, 'dog', unique_filename)
             
-            # Load model and make prediction
+            # MEMORY OPTIMIZATION: Resize large images before prediction
+            optimize_image_for_prediction(file_path, max_size=640)
+            
+            # Load model and make prediction with memory optimization
             model = load_model('dog')
-            results = model.predict(file_path)
+            
+            # AGGRESSIVE MEMORY OPTIMIZATION: Use minimal settings for prediction
+            results = model.predict(
+                file_path,
+                verbose=False,      # Reduce logging overhead
+                stream=False,       # Don't use streaming (saves memory)
+                imgsz=640,          # Use smaller image size (default is often larger)
+                half=False,         # Don't use FP16 (can cause issues on CPU)
+                device='cpu',       # Explicitly use CPU
+                max_det=10          # Limit max detections to save memory
+            )
             
             # MEMORY OPTIMIZATION: Unload model immediately after prediction
             unload_model_after_prediction('dog')
@@ -1264,9 +1303,22 @@ def register_prediction_routes(app, config):
             # Save this upload to session for future cleanup
             save_upload_to_session(session, 'sheep', unique_filename)
             
-            # Load model and make prediction
+            # MEMORY OPTIMIZATION: Resize large images before prediction
+            optimize_image_for_prediction(file_path, max_size=640)
+            
+            # Load model and make prediction with memory optimization
             model = load_model('sheep')
-            results = model.predict(file_path)
+            
+            # AGGRESSIVE MEMORY OPTIMIZATION: Use minimal settings for prediction
+            results = model.predict(
+                file_path,
+                verbose=False,      # Reduce logging overhead
+                stream=False,       # Don't use streaming (saves memory)
+                imgsz=640,          # Use smaller image size (default is often larger)
+                half=False,         # Don't use FP16 (can cause issues on CPU)
+                device='cpu',       # Explicitly use CPU
+                max_det=10          # Limit max detections to save memory
+            )
             
             # MEMORY OPTIMIZATION: Unload model immediately after prediction
             unload_model_after_prediction('sheep')

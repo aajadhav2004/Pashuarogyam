@@ -36,6 +36,8 @@ HF_MODEL_CACHE_DIR = os.getenv('HF_MODEL_CACHE_DIR', 'models_cache')
 ENABLE_MODEL_UNLOAD = os.getenv('ENABLE_MODEL_UNLOAD', 'true').lower() == 'true'
 # Maximum number of models to keep in memory (1 = only current model, saves RAM)
 MODEL_CACHE_SIZE = int(os.getenv('MODEL_CACHE_SIZE', 1))
+# Maximum image size for prediction (smaller = less RAM usage)
+MAX_IMAGE_SIZE = int(os.getenv('MAX_IMAGE_SIZE', 640))
 
 # =================== CHATBOT CONFIGURATION ===================
 CHATBOT_OFFLINE_MODE = os.getenv('CHATBOT_OFFLINE_MODE', 'false').lower() == 'true'
